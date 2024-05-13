@@ -35,6 +35,7 @@ fn main() -> std::io::Result<()> {
     pb.set_default_style("Enkosh files count".to_string());
     let config_arr: Vec<ParentStruct> = parse_files(entries_arr, &pb.progress);
     pb.finish_pb();
+
     for i in config_arr {
         let current_path = i.conf.path.as_ref().unwrap();
         let commands = match i.conf.commands {
@@ -44,11 +45,13 @@ fn main() -> std::io::Result<()> {
                 vec
             }
         };
+        pb = Progress::new(commands.len() as u64);
+        pb.set_path_style(format!("Enkosh {} commands count", i.conf.path.as_ref().unwrap().parent().unwrap().to_string_lossy().to_string().underline()));
         for commands_run in commands {
-            run_command(current_path, commands_run);
+            run_command(current_path, commands_run, &pb.progress);
         }
+        pb.finish_pb();
     }
-
     let elapsed = now_all.elapsed();
     println!("\n\n{} {:.2?}", "Elapsed all time:".italic(), elapsed);
     println!(

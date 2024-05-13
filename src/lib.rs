@@ -57,7 +57,7 @@ pub fn parse_files(entries_arr: Vec<std::fs::DirEntry>, pb: &indicatif::Progress
     config_arr
 }
 
-pub fn run_command(current_path: &std::path::PathBuf, command: String) {
+pub fn run_command(current_path: &std::path::PathBuf, command: String, pb: &indicatif::ProgressBar) {
     if cfg!(target_os = "windows") {
         std::process::Command::new("cmd")
             .args(["/C", command.as_str()])
@@ -70,4 +70,5 @@ pub fn run_command(current_path: &std::path::PathBuf, command: String) {
             .current_dir(current_path.parent().unwrap())
         // .status()
     };
+    pb.inc(1);
 }
