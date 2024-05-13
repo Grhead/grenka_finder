@@ -1,5 +1,6 @@
 
 # Encosh
+[![Apache License 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://choosealicense.com/licenses/apache-2.0/)
 
 A fast flexible command executor written in pure Rust
 
@@ -68,6 +69,5 @@ To deploy this project run (only for binary file):
 
 ## License
 
-[![Apache License 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://choosealicense.com/licenses/apache-2.0/)
 [Apache License 2.0](https://choosealicense.com/licenses/apache-2.0/)
 
