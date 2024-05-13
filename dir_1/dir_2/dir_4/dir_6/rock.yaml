@@ -1,0 +1,2 @@
+conf:
+  commands: "dir > lsfile.md"
