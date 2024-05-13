@@ -1,6 +1,10 @@
+use std::thread;
+use std::time::Duration;
+
 use crate::structs::ParentStruct;
 
 pub mod structs;
+
 pub fn get_files_count(directory: &std::path::PathBuf) -> u64 {
     let mut counter: i32 = 0;
     *files_count(&directory, &mut counter) as u64
@@ -40,7 +44,7 @@ fn files_count<'a>(directory: &'a std::path::PathBuf, counter: &'a mut i32) -> &
     counter
 }
 
-pub fn parse_files(entries_arr: Vec<std::fs::DirEntry>) -> Vec<ParentStruct> {
+pub fn parse_files(entries_arr: Vec<std::fs::DirEntry>, pb: &indicatif::ProgressBar) -> Vec<ParentStruct> {
     let mut config_arr: Vec<ParentStruct> = vec![];
     for i in entries_arr {
         let file = std::fs::File::open(i.path()).unwrap();
@@ -48,6 +52,22 @@ pub fn parse_files(entries_arr: Vec<std::fs::DirEntry>) -> Vec<ParentStruct> {
             serde_yaml::from_value(serde_yaml::from_reader(file).unwrap()).unwrap();
         yaml_struct.conf.path = Some(i.path());
         config_arr.push(yaml_struct);
+        pb.inc(1);
     }
     config_arr
+}
+
+pub fn run_command(current_path: &std::path::PathBuf, command: String) {
+    if cfg!(target_os = "windows") {
+        std::process::Command::new("cmd")
+            .args(["/C", command.as_str()])
+            .current_dir(current_path.parent().unwrap())
+        // .status()
+    } else {
+        std::process::Command::new("sh")
+            .arg("-c")
+            .arg(command.as_str())
+            .current_dir(current_path.parent().unwrap())
+        // .status()
+    };
 }

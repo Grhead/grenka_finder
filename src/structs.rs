@@ -38,7 +38,7 @@ pub struct Args {
 }
 
 pub trait PbInit {
-    fn set_default_style(&self);
+    fn set_default_style(&self, msg: String);
     fn finish_pb(&self);
 }
 
@@ -55,13 +55,14 @@ impl Progress {
 }
 
 impl PbInit for Progress {
-    fn set_default_style(&self) {
+    fn set_default_style(&self, msg: String) {
         self.progress.set_style(
-            ProgressStyle::with_template(
-                "{spinner:.green} [{elapsed_precise}] [{bar:60.cyan/blue}] ({pos}/{len})",
+            ProgressStyle::default_bar().template(
+                "[{elapsed_precise}] {msg:20} [{bar:40.cyan/blue}] ({pos}/{len})",
             )
             .unwrap(),
-        )
+        );
+        self.progress.set_message(msg);
     }
 
     fn finish_pb(&self) {
