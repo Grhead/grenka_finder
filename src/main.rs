@@ -1,32 +1,47 @@
-use crate::structs::{CommandEnum, ParentStruct};
+use std::time::Instant;
+
+use clap::Parser;
+use colored::Colorize;
+
+use grenka_finder::{get_files_count, read_files};
+
+use crate::structs::{Args, CommandEnum, ParentStruct, PbInit, Progress};
 
 mod structs;
 
 fn main() -> std::io::Result<()> {
-    println!("Program start");
-    use std::time::Instant;
+    let console_args = Args::parse();
     let now_all = Instant::now();
-    let now = Instant::now();
+    println!(
+        "{}: {} {}!",
+        "Enkosh".bold().underline().magenta(),
+        "Program".bold(),
+        "start".bold()
+    );
     let current_dir = std::env::current_dir()?;
-    println!("current_dir: {:?}", current_dir);
-    let mut arr: Vec<std::fs::DirEntry> = vec![];
-    read_files(current_dir, &mut arr);
-    let mut elapsed = now.elapsed();
-    println!("Elapsed find: {:.2?}", elapsed);
-    let now = Instant::now();
-    let mut files_arr: Vec<ParentStruct> = vec![];
-    for i in arr {
+    println!(
+        "Selected directory: {}",
+        current_dir.to_string_lossy().to_string().underline()
+    );
+
+    let files_count = get_files_count(&current_dir);
+
+    let pb = Progress::new(files_count);
+    pb.set_default_style();
+
+    let mut entries_arr: Vec<std::fs::DirEntry> = vec![];
+    let mut config_arr: Vec<ParentStruct> = vec![];
+
+    read_files(current_dir, &mut entries_arr, &pb.progress);
+
+    for i in entries_arr {
         let file = std::fs::File::open(i.path()).unwrap();
         let mut yaml_struct: ParentStruct =
             serde_yaml::from_value(serde_yaml::from_reader(file).unwrap()).unwrap();
         yaml_struct.conf.path = Some(i.path());
-        // println!("{:?}", yaml_struct);
-        files_arr.push(yaml_struct);
+        config_arr.push(yaml_struct);
     }
-    elapsed = now.elapsed();
-    println!("Elapsed parse: {:.2?}", elapsed);
-    let now = Instant::now();
-    for i in files_arr {
+    for i in config_arr {
         let current_path = i.conf.path.as_ref().unwrap();
         let commands = match i.conf.commands {
             CommandEnum::Vec(vec) => vec,
@@ -35,36 +50,25 @@ fn main() -> std::io::Result<()> {
                 vec
             }
         };
-        for j in commands {
-            println!("{:?}", std::process::Command::new("cmd")
-                .args(["/C", j.as_str()])
-                .current_dir(current_path.parent().unwrap())
-                .output()
-                .expect("command error")
-                .status)
+        for commands_run in commands {
+            if cfg!(target_os = "windows") {
+                std::process::Command::new("cmd")
+                    .args(["/C", commands_run.as_str()])
+                    .current_dir(current_path.parent().unwrap())
+                    .expect("command error")
+                    .status
+            } else {
+                std::process::Command::new("sh")
+                    .arg("-c")
+                    .arg(commands_run.as_str())
+                    .current_dir(current_path.parent().unwrap())
+                    .expect("command error")
+                    .status
+            };
         }
     }
-    elapsed = now.elapsed();
-    println!("Elapsed run commands: {:.2?}", elapsed);
-    elapsed = now_all.elapsed();
+    let elapsed = now_all.elapsed();
     println!("Elapsed all time: {:.2?}", elapsed);
     println!("Program finish");
     Ok(())
-}
-
-fn read_files(
-    directory: std::path::PathBuf,
-    arr: &mut Vec<std::fs::DirEntry>,
-) -> &Vec<std::fs::DirEntry> {
-    for entry in std::fs::read_dir(directory).unwrap() {
-        let entry = entry.unwrap();
-        let path = entry.path();
-        let metadata = std::fs::metadata(&path).unwrap();
-        if metadata.is_dir() {
-            read_files(path, arr);
-        } else if entry.file_name() == "rock.yaml" {
-            arr.push(entry);
-        }
-    }
-    arr
 }

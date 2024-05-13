@@ -1,9 +1,16 @@
 [package]
 name = "grenka_finder"
+description = "A fast flexible command executor written in pure Rust"
 version = "1.0.0"
 edition = "2021"
+repository = "https://github.com/GRHead/grenka_finder"
+readme = "README.md"
+license = "Apache-2.0"
 
 [dependencies]
+clap = { version = "4.5.4", features = ["derive"] }
+colored = "2.1.0"
+indicatif = "0.17.8"
 serde = { version = "1.0.201", features = ["derive"] }
 serde_yaml = "0.9.34"
 
