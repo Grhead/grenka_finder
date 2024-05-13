@@ -1,28 +1,34 @@
 
-# Grenka-finder
+# Encosh
 
 A fast flexible command executor written in pure Rust
 
 
 ## Features
 
-- Base _rock.yaml_
-- Additional _rock.yaml_ params
+- Base _encosh.yaml_
+- Additional _encosh.yaml_ params
 - Fullscreen mode
 - Cross platform
 
 
 ## Usage/Examples
 
-Linux usage:
+Encosh.yaml file example:
+```yaml
+  conf:
+    commands: "dir > lsfile.md"
+```
+Then run the following commands depending on your operating system:
+
+- Linux usage:
 ```bash
   grenka-finder
 ```
-Windows usage:
+- Windows usage:
 ```bash
   grenka-finder.exe
 ```
-
 
 
 ## Deployment
@@ -42,9 +48,9 @@ To deploy this project run (only for binary file):
 
 ## Roadmap
 
-- Base **rock.yaml** implementation
+- Base **encosh.yaml** implementation
 
-- Additional **rock.yaml** params
+- Additional **encosh.yaml** params
 
 - Implementation of _default_ values
 
