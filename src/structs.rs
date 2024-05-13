@@ -39,6 +39,7 @@ pub struct Args {
 
 pub trait PbInit {
     fn set_default_style(&self);
+    fn finish_pb(&self);
 }
 
 pub struct Progress {
@@ -61,5 +62,9 @@ impl PbInit for Progress {
             )
             .unwrap(),
         )
+    }
+
+    fn finish_pb(&self) {
+        self.progress.finish();
     }
 }

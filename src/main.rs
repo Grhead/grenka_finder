@@ -1,22 +1,20 @@
+
 use std::time::Instant;
 
 use clap::Parser;
 use colored::Colorize;
 
-use grenka_finder::{get_files_count, read_files};
-
-use crate::structs::{Args, CommandEnum, ParentStruct, PbInit, Progress};
-
-mod structs;
+use grenka_finder::{get_files_count, parse_files, read_files};
+use grenka_finder::structs::{Args, CommandEnum, ParentStruct, PbInit, Progress};
 
 fn main() -> std::io::Result<()> {
     let console_args = Args::parse();
     let now_all = Instant::now();
     println!(
-        "{}: {} {}!",
-        "Enkosh".bold().underline().magenta(),
-        "Program".bold(),
-        "start".bold()
+        "{} - {} {}!",
+        "START".bold().underline(),
+        "Enkosh".bold().magenta(),
+        "program".bold(),
     );
     let current_dir = std::env::current_dir()?;
     println!(
@@ -30,17 +28,9 @@ fn main() -> std::io::Result<()> {
     pb.set_default_style();
 
     let mut entries_arr: Vec<std::fs::DirEntry> = vec![];
-    let mut config_arr: Vec<ParentStruct> = vec![];
-
     read_files(current_dir, &mut entries_arr, &pb.progress);
-
-    for i in entries_arr {
-        let file = std::fs::File::open(i.path()).unwrap();
-        let mut yaml_struct: ParentStruct =
-            serde_yaml::from_value(serde_yaml::from_reader(file).unwrap()).unwrap();
-        yaml_struct.conf.path = Some(i.path());
-        config_arr.push(yaml_struct);
-    }
+    pb.finish_pb();
+    let config_arr: Vec<ParentStruct> = parse_files(entries_arr);
     for i in config_arr {
         let current_path = i.conf.path.as_ref().unwrap();
         let commands = match i.conf.commands {
@@ -62,11 +52,17 @@ fn main() -> std::io::Result<()> {
                     .arg(commands_run.as_str())
                     .current_dir(current_path.parent().unwrap())
                     .status()
-            }.expect("TODO: panic message");
+            }.expect("command internal error");
         }
     }
     let elapsed = now_all.elapsed();
     println!("Elapsed all time: {:.2?}", elapsed);
-    println!("Program finish");
+    println!(
+        "{} - {} {}!",
+        "FINISH".bold().underline(),
+        "Enkosh".bold().magenta(),
+        "program".bold(),
+
+    );
     Ok(())
 }

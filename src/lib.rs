@@ -1,8 +1,17 @@
+use crate::structs::ParentStruct;
+
+pub mod structs;
+pub fn get_files_count(directory: &std::path::PathBuf) -> u64 {
+    let mut counter: i32 = 0;
+    *files_count(&directory, &mut counter) as u64
+}
+
 pub fn read_files<'a>(
     directory: std::path::PathBuf,
     arr: &'a mut Vec<std::fs::DirEntry>,
     pb: &'a indicatif::ProgressBar,
 ) -> &'a Vec<std::fs::DirEntry> {
+    pb.inc(1);
     for entry in std::fs::read_dir(directory).unwrap() {
         let entry = entry.unwrap();
         let path = entry.path();
@@ -12,9 +21,8 @@ pub fn read_files<'a>(
         } else if entry.file_name() == "rock.yaml" {
             arr.push(entry);
         }
-        pb.inc(1);
     }
-    pb.finish_with_message("done!");
+
     arr
 }
 
@@ -31,7 +39,15 @@ fn files_count<'a>(directory: &'a std::path::PathBuf, counter: &'a mut i32) -> &
     }
     counter
 }
-pub fn get_files_count(directory: &std::path::PathBuf) -> u64 {
-    let mut counter: i32 = 0;
-    *files_count(&directory, &mut counter) as u64
+
+pub fn parse_files(entries_arr: Vec<std::fs::DirEntry>) -> Vec<ParentStruct> {
+    let mut config_arr: Vec<ParentStruct> = vec![];
+    for i in entries_arr {
+        let file = std::fs::File::open(i.path()).unwrap();
+        let mut yaml_struct: ParentStruct =
+            serde_yaml::from_value(serde_yaml::from_reader(file).unwrap()).unwrap();
+        yaml_struct.conf.path = Some(i.path());
+        config_arr.push(yaml_struct);
+    }
+    config_arr
 }
