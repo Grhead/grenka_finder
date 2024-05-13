@@ -55,16 +55,14 @@ fn main() -> std::io::Result<()> {
                 std::process::Command::new("cmd")
                     .args(["/C", commands_run.as_str()])
                     .current_dir(current_path.parent().unwrap())
-                    .expect("command error")
-                    .status
+                    .status()
             } else {
                 std::process::Command::new("sh")
                     .arg("-c")
                     .arg(commands_run.as_str())
                     .current_dir(current_path.parent().unwrap())
-                    .expect("command error")
-                    .status
-            };
+                    .status()
+            }.expect("TODO: panic message");
         }
     }
     let elapsed = now_all.elapsed();
