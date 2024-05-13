@@ -58,19 +58,17 @@ impl Progress {
 impl PbInit for Progress {
     fn set_default_style(&self, msg: String) {
         self.progress.set_style(
-            ProgressStyle::default_bar().template(
-                "[{elapsed_precise}] {msg:20} [{bar:40.cyan/blue}] ({pos}/{len})",
-            )
-            .unwrap(),
+            ProgressStyle::default_bar()
+                .template("[{elapsed_precise}] {msg:20} [{bar:40.cyan/blue}] ({pos}/{len})")
+                .unwrap(),
         );
         self.progress.set_message(msg);
     }
 
     fn set_path_style(&self, msg: String) {
         self.progress.set_style(
-            ProgressStyle::default_bar().template(
-                "[{elapsed_precise}] {msg1:20} [{bar:40.green/blue}] ({pos}/{len}) {msg}",
-            )
+            ProgressStyle::default_bar()
+                .template("[{elapsed_precise}] {msg1:20} [{bar:40.green/blue}] ({pos}/{len}) {msg}")
                 .unwrap(),
         );
         self.progress.set_prefix("");

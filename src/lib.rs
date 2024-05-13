@@ -44,7 +44,10 @@ fn files_count<'a>(directory: &'a std::path::PathBuf, counter: &'a mut i32) -> &
     counter
 }
 
-pub fn parse_files(entries_arr: Vec<std::fs::DirEntry>, pb: &indicatif::ProgressBar) -> Vec<ParentStruct> {
+pub fn parse_files(
+    entries_arr: Vec<std::fs::DirEntry>,
+    pb: &indicatif::ProgressBar,
+) -> Vec<ParentStruct> {
     let mut config_arr: Vec<ParentStruct> = vec![];
     for i in entries_arr {
         let file = std::fs::File::open(i.path()).unwrap();
@@ -57,7 +60,11 @@ pub fn parse_files(entries_arr: Vec<std::fs::DirEntry>, pb: &indicatif::Progress
     config_arr
 }
 
-pub fn run_command(current_path: &std::path::PathBuf, command: String, pb: &indicatif::ProgressBar) {
+pub fn run_command(
+    current_path: &std::path::PathBuf,
+    command: String,
+    pb: &indicatif::ProgressBar,
+) {
     if cfg!(target_os = "windows") {
         std::process::Command::new("cmd")
             .args(["/C", command.as_str()])

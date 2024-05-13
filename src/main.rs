@@ -1,11 +1,10 @@
-
 use std::time::Instant;
 
 use clap::Parser;
 use colored::Colorize;
 
-use grenka_finder::{get_files_count, parse_files, read_files, run_command};
 use grenka_finder::structs::{Args, CommandEnum, ParentStruct, PbInit, Progress};
+use grenka_finder::{get_files_count, parse_files, read_files, run_command};
 
 fn main() -> std::io::Result<()> {
     let console_args = Args::parse();
@@ -46,7 +45,18 @@ fn main() -> std::io::Result<()> {
             }
         };
         pb = Progress::new(commands.len() as u64);
-        pb.set_path_style(format!("Enkosh {} commands count", i.conf.path.as_ref().unwrap().parent().unwrap().to_string_lossy().to_string().underline()));
+        pb.set_path_style(format!(
+            "Enkosh {} commands count",
+            i.conf
+                .path
+                .as_ref()
+                .unwrap()
+                .parent()
+                .unwrap()
+                .to_string_lossy()
+                .to_string()
+                .underline()
+        ));
         for commands_run in commands {
             run_command(current_path, commands_run, &pb.progress);
         }
@@ -59,7 +69,6 @@ fn main() -> std::io::Result<()> {
         "FINISH".bold().underline(),
         "Enkosh".bold().magenta(),
         "program".bold(),
-
     );
     Ok(())
 }
