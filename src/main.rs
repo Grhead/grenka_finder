@@ -36,11 +36,12 @@ fn main() -> std::io::Result<()> {
             }
         };
         for j in commands {
-            std::process::Command::new("cmd")
+            println!("{:?}", std::process::Command::new("cmd")
                 .args(["/C", j.as_str()])
                 .current_dir(current_path.parent().unwrap())
                 .output()
-                .expect("Failed to execute command");
+                .expect("command error")
+                .status)
         }
     }
     elapsed = now.elapsed();
