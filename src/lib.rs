@@ -66,16 +66,18 @@ pub fn run_command(
     pb: &indicatif::ProgressBar,
 ) {
     if cfg!(target_os = "windows") {
+        println!("windows");
         std::process::Command::new("cmd")
             .args(["/C", command.as_str()])
             .current_dir(current_path.parent().unwrap())
-        // .status()
+            .status()
     } else {
+        println!("linux");
         std::process::Command::new("sh")
             .arg("-c")
             .arg(command.as_str())
             .current_dir(current_path.parent().unwrap())
-        // .status()
-    };
+            .status()
+    }.expect("run command error");
     pb.inc(1);
 }
